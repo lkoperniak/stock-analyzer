@@ -1,0 +1,116 @@
+@startuml Stock Analyzer System Overview
+
+title Stock Analyzer System - Component Overview
+
+' Define actors
+actor "Investor" as investor
+actor "System Admin" as admin
+
+' Define external systems
+cloud "Stock Data Provider\n(Alpha Vantage, Yahoo Finance)" as stockProvider
+cloud "Notification Service\n(Email/SMS)" as notificationSvc
+
+' Define main system boundary
+package "Stock Analyzer System" {
+    
+    ' Frontend layer
+    package "Frontend Layer" {
+        component "Web Application\n(React/TypeScript)" as webapp {
+            component "Dashboard" as dashboard
+        
+            component "Stock Search" as search
+            component "Charts" as charts
+            component "Portfolio" as portfolio
+            component "Alerts" as alerts
+        }
+    }
+    
+    ' API layer
+    package "API Layer" {
+        component "API Gateway\n(Node.js/Express)" as api {
+            component "Stock Controller" as stockCtrl
+            component "Portfolio Controller" as portfolioCtrl
+            component "User Controller" as userCtrl
+            component "Alert Controller" as alertCtrl
+        }
+    }
+    
+    ' Analysis layer
+    package "Analysis Layer" {
+        component "Analysis Engine\n(Python/FastAPI)" as analysis {
+            component "Technical Analyzer" as techAnalyzer
+            component "Trend Analyzer" as trendAnalyzer
+            component "Risk Calculator" as riskCalc
+            component "Prediction Engine" as prediction
+        }
+    }
+    
+    ' Data layer
+    package "Data Layer" {
+        database "PostgreSQL\nDatabase" as db
+        database "Redis\nCache" as cache
+    }
+    
+    ' Background processing
+    package "Background Processing" {
+        component "Background Jobs\n(Node.js/Bull)" as jobs {
+            component "Data Updater" as dataUpdater
+            component "Alert Processor" as alertProcessor
+            component "Portfolio Calculator" as portfolioCalc
+        }
+    }
+}
+
+' Define relationships
+investor --> webapp : "Uses web interface"
+admin --> webapp : "Administers system"
+
+webapp --> api : "REST API calls\n(JSON/HTTPS)"
+api --> analysis : "Analysis requests\n(JSON/HTTP)"
+api --> db : "Data operations\n(SQL/TCP)"
+api --> cache : "Cache operations\n(Redis Protocol)"
+
+analysis --> db : "Read stock data\n(SQL/TCP)"
+analysis --> cache : "Cache results\n(Redis Protocol)"
+
+jobs --> stockProvider : "Fetch market data\n(HTTPS/REST)"
+jobs --> db : "Update data\n(SQL/TCP)"
+jobs --> cache : "Update cache\n(Redis Protocol)"
+jobs --> notificationSvc : "Send alerts\n(HTTPS/REST)"
+
+' Component relationships
+dashboard --> stockCtrl
+search --> stockCtrl
+charts --> stockCtrl
+portfolio --> portfolioCtrl
+alerts --> alertCtrl
+
+stockCtrl --> techAnalyzer
+stockCtrl --> trendAnalyzer
+portfolioCtrl --> riskCalc
+
+dataUpdater --> techAnalyzer
+alertProcessor --> prediction
+
+' Styling
+skinparam component {
+    BackgroundColor lightblue
+    BorderColor darkblue
+}
+
+skinparam database {
+    BackgroundColor lightgreen
+    BorderColor darkgreen
+}
+
+skinparam cloud {
+    BackgroundColor lightyellow
+    BorderColor orange
+}
+
+skinparam actor {
+    BackgroundColor lightpink
+    BorderColor red
+}
+
+@enduml
